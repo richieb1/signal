@@ -34,18 +34,6 @@ Three files:
 - Stocks with full 1yr/3yr/5yr history play by the normal rules above.
 - The **Score column** shows `N/M years` so it's transparent when a stock wasn't judged on all three windows.
 
-## Automating daily updates
-
-Two clean paths, either works:
-
-1. **GitHub Actions + GitHub Pages** (free, recommended)
-   - Put the script + `portfolio.csv` in a GitHub repo.
-   - Add a workflow that runs the script on a cron schedule (e.g. weekdays at 5pm ET) and commits the generated `recommendations.html` to a `docs/` folder.
-   - Enable Pages on that folder. You now have a public URL that updates daily on its own.
-2. **A tiny cron job on any always-on machine** — a Mac mini, a Raspberry Pi, a $5 VPS. Same script, same output, served by any static web server (or just Dropbox/Google Drive with a share link).
-
-Happy to write either the Actions workflow or the cron setup when you're ready.
-
 ## Caveats
 
 - `yfinance` is an unofficial scraper of Yahoo Finance. It breaks occasionally — usually fixed with `pip install --upgrade yfinance`. For anything client-facing at scale, consider a paid data feed (Polygon, Tiingo, Alpha Vantage).

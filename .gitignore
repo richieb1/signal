@@ -1,0 +1,26 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+
+# Private data — never commit
+portfolio.csv
+
+# Generated outputs
+recommendations.csv
+recommendations.html
+
+# macOS / editor noise
+.DS_Store
+.vscode/
+.idea/
+*.swp
+recommendations_sample.*

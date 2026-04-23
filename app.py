@@ -164,8 +164,13 @@ st.divider()
 
 # ---------- Results table ----------
 # Build a clean dataframe for on-page display.
+# Sort: group (BUY/HOLD/SELL/ERROR) first, then avg margin vs S&P descending,
+# so the strongest performers rise to the top of each group. Ties on symbol.
 order = {"BUY": 0, "HOLD": 1, "SELL": 2, "ERROR": 3}
-sorted_results = sorted(results, key=lambda r: (order.get(r.recommendation, 9), r.symbol))
+sorted_results = sorted(
+    results,
+    key=lambda r: (order.get(r.recommendation, 9), -bhs.sort_score(r, bench_returns), r.symbol),
+)
 
 table_rows = []
 for r in sorted_results:

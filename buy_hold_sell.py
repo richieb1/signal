@@ -190,6 +190,28 @@ def fmt_pct(x: Optional[float]) -> str:
     return f"{x * 100:+.1f}%"
 
 
+def sort_score(r: "StockResult", bench: dict[int, Optional[float]]) -> float:
+    """Average margin vs S&P 500 across the periods we can compare on.
+
+    For each period where we have both a stock return and a benchmark return,
+    compute (stock - benchmark) and average those differences. Young stocks
+    (missing 3yr or 5yr data) are sorted by the margin they *do* have.
+
+    Stocks with no comparable history at all get a very negative score so they
+    sink to the bottom of their group (which in practice will be SELL).
+    """
+    diffs: list[float] = []
+    for years in PERIODS_YEARS:
+        s = r.returns.get(years)
+        b = bench.get(years)
+        if s is None or b is None:
+            continue
+        diffs.append(s - b)
+    if not diffs:
+        return float("-inf")
+    return sum(diffs) / len(diffs)
+
+
 def write_csv(results: list[StockResult], bench: dict[int, Optional[float]], path: Path) -> None:
     with path.open("w", newline="") as f:
         w = csv.writer(f)
@@ -239,9 +261,14 @@ def write_html(results: list[StockResult], bench: dict[int, Optional[float]], pa
             f'</tr>'
         )
 
-    # Sort: BUY first, then HOLD, then SELL, then ERROR; alphabetical within group
+    # Sort: BUY first, then HOLD, then SELL, then ERROR. Within each group,
+    # order by average margin vs S&P descending (strongest outperformers at top,
+    # deepest laggards at bottom). Ties break on symbol for determinism.
     order = {"BUY": 0, "HOLD": 1, "SELL": 2, "ERROR": 3}
-    sorted_results = sorted(results, key=lambda r: (order.get(r.recommendation, 9), r.symbol))
+    sorted_results = sorted(
+        results,
+        key=lambda r: (order.get(r.recommendation, 9), -sort_score(r, bench), r.symbol),
+    )
 
     rows_html = "\n".join(row_html(r) for r in sorted_results)
     bench_row = (

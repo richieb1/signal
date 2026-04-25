@@ -209,7 +209,7 @@ def sort_score(r: "StockResult", bench: dict[int, Optional[float]]) -> float:
         diffs.append(s - b)
     if not diffs:
         return float("-inf")
-    return sum(diffs) / len(diffs)
+    return max(diffs)
 
 
 def write_csv(results: list[StockResult], bench: dict[int, Optional[float]], path: Path) -> None:
